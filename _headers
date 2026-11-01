@@ -1,24 +1,16 @@
-# Cloudflare Pages 缓存策略
-# 语法：路径模式 + 缩进的响应头
+# Cloudflare Pages headers
+# NOTE: exact filenames did not apply; use wildcards
 
-# 内容配置文件：永不缓存，每次改完立刻生效
-/assets/js/content.js
-  Cache-Control: no-cache, must-revalidate
-
-# 渲染逻辑：短缓存（改代码的概率低）
-/assets/js/main.js
-  Cache-Control: public, max-age=3600
-
-# 样式：一天
-/assets/css/*
-  Cache-Control: public, max-age=86400
-
-# 图片：一周
-/assets/img/*
-  Cache-Control: public, max-age=604800
-
-# HTML 与兜底：不缓存
 /*
   Cache-Control: no-cache
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+
+/assets/js/*
+  Cache-Control: no-cache, must-revalidate
+
+/assets/css/*
+  Cache-Control: public, max-age=86400
+
+/assets/img/*
+  Cache-Control: public, max-age=604800
