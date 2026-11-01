@@ -18,7 +18,7 @@ window.SITE = {
     tagline: "努力把有趣的想法落地",
     // 头像：填图片路径（放在 assets/img/ 下，比如 "assets/img/avatar.jpg"）
     // 留空则自动用名字的第一个字生成圆形头像
-    avatar: "",
+    avatar: "assets/img/avatar.jpg",
     buttons: [
       { text: "看看我的项目", href: "#projects", primary: true },
       { text: "联系我", href: "#contact", primary: false },
@@ -47,25 +47,10 @@ window.SITE = {
     title: "项目",
     items: [
       {
-        title: "项目一：开发板部署Astrbot",
-        desc: "在orange pi zero3w开发板上运行Ubuntu系统，尝试linux系统的操作方法，并实现Astrbot长期本地运行。",
+        title: "开发板部署 AstrBot",
+        desc: "在 Orange Pi Zero 3W 上运行 Ubuntu 系统，摸索 Linux 常用操作，并让 AstrBot 长期稳定运行。",
         tags: ["Linux", "Docker"],
-        link: "None",
-        linkText: "None",
-      },
-      {
-        title: "项目二：暂无",
-        desc: "",
-        tags: [],
-        link: "None",
-        linkText: "None",
-      },
-      {
-        title: "暂无",
-        desc: "",
-        tags: [],
-        link: "",
-        linkText: "",
+        // 有外链就加 link 和 linkText，没有就整个删掉，卡片底部不会出现多余链接
       },
     ],
   },
@@ -81,10 +66,11 @@ window.SITE = {
     ],
   },
 
-   /* ---------- 页脚 ---------- */
+  /* ---------- 页脚 ---------- */
   footer: {
     text: "一位默默无闻的developer",
   },
+
   /* ---------- 友链 ---------- */
   friends: {
     title: "友链",
@@ -95,8 +81,9 @@ window.SITE = {
         name: "wuko's blog",
         url: "https://blog.wuko.top",
         desc: "从零开始，由心而发。欢迎共同交流学习！",
-        avatar: "https://blog.wuko.top/favicon.png",
+        avatar: "assets/img/friend-wuko.jpg",
       },
     ],
   },
+
 };
