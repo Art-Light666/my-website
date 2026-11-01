@@ -167,36 +167,52 @@
     /* ---------------- 友链 ---------------- */
   if (S.friends && (S.friends.items || []).length) {
     var friends = section("friends", S.friends.title || "友链");
-    var flist = h("ul", "friend-list");
+    var panel = h("div", "friends-panel");
+    var flist = h("ul", "friends-grid");
+
     S.friends.items.forEach(function (f) {
-      var li = h("li", "friend");
+      var li = h("li", "friend-item");
       var a = makeLink(f.url, "friend-link");
-      var av = h("span", "friend-avatar");
+
+      // 缩略图：尺寸写死在内联样式，不依赖外部 CSS（避免样式缓存导致图片撑大）
+      var thumb;
+      var imgStyle = "width:34px;height:34px;border-radius:8px;flex:0 0 auto;display:block;object-fit:cover;background:var(--accent-soft)";
+      var letterStyle = "width:34px;height:34px;border-radius:8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:15px";
+
       if (f.avatar) {
-        var fimg = h("img");
-        fimg.src = f.avatar;
-        fimg.alt = f.name || "";
-        fimg.loading = "lazy";
-        fimg.onerror = function () {
-          av.removeChild(fimg);
-          av.textContent = (f.name || "?").trim().charAt(0);
+        thumb = h("img", "friend-thumb");
+        thumb.src = f.avatar;
+        thumb.alt = f.name || "";
+        thumb.width = 34;
+        thumb.height = 34;
+        thumb.loading = "lazy";
+        thumb.style.cssText = imgStyle;
+        thumb.onerror = function () {
+          var fb = h("span", "friend-thumb", (f.name || "?").trim().charAt(0));
+          fb.style.cssText = letterStyle;
+          if (this.parentNode) this.parentNode.replaceChild(fb, this);
         };
-        av.appendChild(fimg);
       } else {
-        av.textContent = (f.name || "?").trim().charAt(0);
+        thumb = h("span", "friend-thumb", (f.name || "?").trim().charAt(0));
+        thumb.style.cssText = letterStyle;
       }
-      a.appendChild(av);
+      a.appendChild(thumb);
+
       var info = h("span", "friend-info");
       info.appendChild(h("span", "friend-name", f.name || ""));
       if (f.desc) info.appendChild(h("span", "friend-desc", f.desc));
       a.appendChild(info);
+
       li.appendChild(a);
       flist.appendChild(li);
     });
-    friends.appendChild(flist);
+
+    panel.appendChild(flist);
+    friends.appendChild(panel);
     app.appendChild(friends);
   }
-/* ---------------- 页脚 ---------------- */
+
+  /* ---------------- 页脚 ---------------- */
   if (S.footer) {
     var footer = h("footer", "footer");
     footer.appendChild(h("p", null, S.footer.text || ""));
