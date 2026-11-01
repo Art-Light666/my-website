@@ -7,15 +7,15 @@ window.SITE = {
 
   /* ---------- 基本信息（浏览器标签页、搜索引擎用） ---------- */
   meta: {
-    title: "李明的个人主页",
-    description: "前端工程师 / 独立开发者，做一些有用的小东西。",
+    title: "东林海院26级某学生的个人主页",
+    description: "努力学习计算机知识的萌新，偶尔做一些有趣的小玩意儿。\n喜欢玩鸣潮，六链爱弥斯享受者。",
     lang: "zh-CN",
   },
 
   /* ---------- 首屏 ---------- */
   hero: {
-    name: "李明",
-    tagline: "前端工程师 · 独立开发者 · 喜欢把想法做成能用的东西",
+    name: "",
+    tagline: "努力把有趣的想法落地",
     // 头像：填图片路径（放在 assets/img/ 下，比如 "assets/img/avatar.jpg"）
     // 留空则自动用名字的第一个字生成圆形头像
     avatar: "",
@@ -30,15 +30,15 @@ window.SITE = {
     title: "关于我",
     // 每一段是一个 <p>
     paragraphs: [
-      "我是一名前端工程师，日常和 JavaScript、CSS、各种框架打交道。喜欢把复杂的东西做得简单，把简单的东西做得好看。",
-      "业余时间会写一些开源小工具，也折腾硬件（树莓派、香橙派之类的开发板）。相信「能用」比「完美」更重要。",
+      " 我是一枚计算机萌新，喜欢二次元，对计算机程序设计具有浓厚兴趣。",
+      "业余时间会写一些开源小工具，也尝试折腾硬件（香橙派开发板）。目前还在不断努力学习中！",
     ],
   },
 
   /* ---------- 技能标签 ---------- */
   skills: {
     title: "技能",
-    items: ["JavaScript", "TypeScript", "Vue", "React", "Node.js", "Python", "Linux", "Docker"],
+    items: ["Python", "Linux", "Docker"],
   },
 
   /* ---------- 项目作品 ---------- */
@@ -46,23 +46,23 @@ window.SITE = {
     title: "项目",
     items: [
       {
-        title: "项目一：图片压缩工具",
-        desc: "浏览器端批量压缩图片，不上传服务器，隐私友好。支持 PNG/JPG/WebP。",
-        tags: ["Vue", "Canvas"],
-        link: "https://example.com",
-        linkText: "在线体验",
+        title: "项目一：开发板部署Astrbot",
+        desc: "在orange pi zero3w开发板上运行Ubuntu系统，尝试linux系统的操作方法，并实现Astrbot长期本地运行。",
+        tags: ["Linux", "Docker"],
+        link: "None",
+        linkText: "None",
       },
       {
-        title: "项目二：开发板监控面板",
-        desc: "在 Orange Pi 上跑的轻量监控，实时显示温度、内存、网络状态。",
-        tags: ["Python", "Linux"],
-        link: "https://example.com",
-        linkText: "查看源码",
+        title: "项目二：暂无",
+        desc: "",
+        tags: [],
+        link: "None",
+        linkText: "None",
       },
       {
-        title: "项目三：Markdown 简历生成器",
-        desc: "用 Markdown 写简历，一键导出 PDF，模板可自定义。",
-        tags: ["Node.js", "CLI"],
+        title: "暂无",
+        desc: "",
+        tags: [],
         link: "",
         linkText: "",
       },
@@ -72,7 +72,7 @@ window.SITE = {
   /* ---------- 联系方式 ---------- */
   contact: {
     title: "联系我",
-    text: "想聊技术、合作，或者只是打个招呼，都欢迎。",
+    text: "想聊技术、合作，或者只是打个招呼，都欢迎哦。",
     items: [
       { label: "邮箱", value: "you@example.com", href: "mailto:you@example.com" },
       { label: "GitHub", value: "github.com/yourname", href: "https://github.com/yourname" },
@@ -82,7 +82,7 @@ window.SITE = {
 
   /* ---------- 页脚 ---------- */
   footer: {
-    text: "© 2026 李明 · 用 HTML / CSS / JavaScript 手写",
+    text: "一位默默无闻的developer",
   },
 
 };
