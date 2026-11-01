@@ -434,3 +434,70 @@ a.contact-value:hover { color: var(--accent); }
   border-radius: 10px;
   display: block;
 }
+/* ---------- 友链：紧凑小窗口面板 ---------- */
+.friends-panel {
+  display: inline-block;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px;
+  box-shadow: var(--shadow);
+}
+
+.friends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 230px);
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.friend-item { min-width: 0; }
+
+.friend-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+.friend-link:hover {
+  text-decoration: none;
+  background: var(--bg-soft);
+}
+
+.friend-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.friend-name {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friend-desc {
+  display: block;
+  color: var(--text-mute);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .friends-panel { display: block; }
+  .friends-grid { grid-template-columns: 1fr; }
+}
