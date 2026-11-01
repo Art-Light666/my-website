@@ -81,9 +81,22 @@ window.SITE = {
     ],
   },
 
-  /* ---------- 页脚 ---------- */
+   /* ---------- 页脚 ---------- */
   footer: {
     text: "一位默默无闻的developer",
   },
-
+  /* ---------- 友链 ---------- */
+  friends: {
+    title: "友链",
+    items: [
+      // 加友链：复制一段 { } 用逗号隔开
+      // avatar 可以留空，会自动用名字第一个字做头像
+      {
+        name: "wuko's blog",
+        url: "https://blog.wuko.top",
+        desc: "从零开始，由心而发。欢迎共同交流学习！",
+        avatar: "https://blog.wuko.top/favicon.png",
+      },
+    ],
+  },
 };
