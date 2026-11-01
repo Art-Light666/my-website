@@ -75,9 +75,9 @@ window.SITE = {
     title: "联系我",
     text: "想聊技术、合作，或者只是打个招呼，都欢迎哦。",
     items: [
-      { label: "邮箱", value: "you@example.com", href: "mailto:you@example.com" },
-      { label: "GitHub", value: "github.com/yourname", href: "https://github.com/yourname" },
-      { label: "微信", value: "your_wechat", href: "" },
+      { label: "邮箱", value: "暂不透露", href: "" },
+      { label: "GitHub", value: "github.com/Art-Light666", href: "https://github.com/Art-Light666" },
+      { label: "微信", value: "暂不透露", href: "" },
     ],
   },
 
