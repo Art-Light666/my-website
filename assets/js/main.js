@@ -164,7 +164,39 @@
     app.appendChild(contact);
   }
 
-  /* ---------------- 页脚 ---------------- */
+    /* ---------------- 友链 ---------------- */
+  if (S.friends && (S.friends.items || []).length) {
+    var friends = section("friends", S.friends.title || "友链");
+    var flist = h("ul", "friend-list");
+    S.friends.items.forEach(function (f) {
+      var li = h("li", "friend");
+      var a = makeLink(f.url, "friend-link");
+      var av = h("span", "friend-avatar");
+      if (f.avatar) {
+        var fimg = h("img");
+        fimg.src = f.avatar;
+        fimg.alt = f.name || "";
+        fimg.loading = "lazy";
+        fimg.onerror = function () {
+          av.removeChild(fimg);
+          av.textContent = (f.name || "?").trim().charAt(0);
+        };
+        av.appendChild(fimg);
+      } else {
+        av.textContent = (f.name || "?").trim().charAt(0);
+      }
+      a.appendChild(av);
+      var info = h("span", "friend-info");
+      info.appendChild(h("span", "friend-name", f.name || ""));
+      if (f.desc) info.appendChild(h("span", "friend-desc", f.desc));
+      a.appendChild(info);
+      li.appendChild(a);
+      flist.appendChild(li);
+    });
+    friends.appendChild(flist);
+    app.appendChild(friends);
+  }
+/* ---------------- 页脚 ---------------- */
   if (S.footer) {
     var footer = h("footer", "footer");
     footer.appendChild(h("p", null, S.footer.text || ""));
