@@ -25,7 +25,26 @@
   <!-- 由 assets/js/main.js 根据 content.js 渲染 -->
 </main>
 
-<script src="assets/js/content.js"></script>
-<script src="assets/js/main.js"></script>
+<!--
+  说明：给 JS 加时间戳加载，强制浏览器每次都取最新版本。
+  这是为了绕开 Cloudflare Pages 对 .js 文件的 4 小时缓存。
+  这样你改完 content.js 提交，刷新页面立刻就能看到，不需要强刷。
+-->
+<script>
+(function () {
+  var v = Date.now();
+  function load(src, done) {
+    var s = document.createElement("script");
+    s.src = src + "?v=" + v;
+    s.onload = done;
+    s.onerror = function () { console.error("加载失败:", src); };
+    document.head.appendChild(s);
+  }
+  load("assets/js/content.js", function () {
+    load("assets/js/main.js", null);
+  });
+})();
+</script>
+
 </body>
 </html>
