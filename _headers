@@ -1,5 +1,5 @@
 # Cloudflare Pages headers
-# NOTE: exact filenames did not apply; use wildcards
+# no-cache for js/css so edits show up immediately
 
 /*
   Cache-Control: no-cache
@@ -10,7 +10,7 @@
   Cache-Control: no-cache, must-revalidate
 
 /assets/css/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: no-cache, must-revalidate
 
 /assets/img/*
-  Cache-Control: public, max-age=604800
+  Cache-Control: public, max-age=86400
