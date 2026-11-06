@@ -118,3 +118,16 @@ export type CommentsConfig = {
 	reactionsEnabled: boolean;
 	inputPosition: "top" | "bottom";
 };
+
+export type FriendLink = {
+	name: string;
+	url: string;
+	desc?: string;
+	avatar?: string; // 放在 public/ 下就写 "/uploads/xxx.jpg"
+};
+
+export type FriendsConfig = {
+	title: string;
+	description?: string;
+	links: FriendLink[];
+};

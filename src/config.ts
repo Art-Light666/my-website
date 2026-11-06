@@ -1,6 +1,7 @@
 import type {
 	CommentsConfig,
 	ExpressiveCodeConfig,
+	FriendsConfig,
 	LicenseConfig,
 	NavBarConfig,
 	ProfileConfig,
@@ -70,10 +71,26 @@ export const profileConfig: ProfileConfig = {
 			url: "https://github.com/Art-Light666",
 		},
 		{
-			name: "友链",
+			name: "友站",
 			icon: "fa6-solid:link",
-			url: "https://blog.wuko.top",
+			url: "/friends/",
 		},
+	],
+};
+
+/* ---------- 友站（独立页面 /friends/） ---------- */
+export const friendsConfig: FriendsConfig = {
+	title: "友站",
+	description: "一些朋友的站点，欢迎去看看。",
+	links: [
+		{
+			name: "wuko's blog",
+			url: "https://blog.wuko.top",
+			desc: "从零开始，由心而发。欢迎共同交流学习！",
+			avatar: "/uploads/friend-wuko.jpg",
+		},
+		// 加友站：复制一段 { } 用逗号隔开
+		// avatar 留空就用名字第一个字当头像
 	],
 };
 
@@ -86,7 +103,7 @@ export const licenseConfig: LicenseConfig = {
 export const commentsConfig: CommentsConfig = {
 	enable: true,
 	provider: "giscus",
-	repo: "Art-Light666/my-blog",
+	repo: "Art-Light666/my-website",
 
 	// ↓↓↓ giscus 的两个 ID，去 https://giscus.app 填完仓库信息后能拿到
 	// 都在页面下方生成的代码里：data-repo-id 和 data-category-id
