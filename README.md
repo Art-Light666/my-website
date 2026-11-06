@@ -1,179 +1,99 @@
-# 个人主页 / 作品集
+# 🍥Fuwari  
+![Node.js >= 20](https://img.shields.io/badge/node.js-%3E%3D20-brightgreen) 
+![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue) 
+[![DeepWiki](https://img.shields.io/badge/DeepWiki-saicaca%2Ffuwari-blue.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAyCAYAAAAnWDnqAAAAAXNSR0IArs4c6QAAA05JREFUaEPtmUtyEzEQhtWTQyQLHNak2AB7ZnyXZMEjXMGeK/AIi+QuHrMnbChYY7MIh8g01fJoopFb0uhhEqqcbWTp06/uv1saEDv4O3n3dV60RfP947Mm9/SQc0ICFQgzfc4CYZoTPAswgSJCCUJUnAAoRHOAUOcATwbmVLWdGoH//PB8mnKqScAhsD0kYP3j/Yt5LPQe2KvcXmGvRHcDnpxfL2zOYJ1mFwrryWTz0advv1Ut4CJgf5uhDuDj5eUcAUoahrdY/56ebRWeraTjMt/00Sh3UDtjgHtQNHwcRGOC98BJEAEymycmYcWwOprTgcB6VZ5JK5TAJ+fXGLBm3FDAmn6oPPjR4rKCAoJCal2eAiQp2x0vxTPB3ALO2CRkwmDy5WohzBDwSEFKRwPbknEggCPB/imwrycgxX2NzoMCHhPkDwqYMr9tRcP5qNrMZHkVnOjRMWwLCcr8ohBVb1OMjxLwGCvjTikrsBOiA6fNyCrm8V1rP93iVPpwaE+gO0SsWmPiXB+jikdf6SizrT5qKasx5j8ABbHpFTx+vFXp9EnYQmLx02h1QTTrl6eDqxLnGjporxl3NL3agEvXdT0WmEost648sQOYAeJS9Q7bfUVoMGnjo4AZdUMQku50McDcMWcBPvr0SzbTAFDfvJqwLzgxwATnCgnp4wDl6Aa+Ax283gghmj+vj7feE2KBBRMW3FzOpLOADl0Isb5587h/U4gGvkt5v60Z1VLG8BhYjbzRwyQZemwAd6cCR5/XFWLYZRIMpX39AR0tjaGGiGzLVyhse5C9RKC6ai42ppWPKiBagOvaYk8lO7DajerabOZP46Lby5wKjw1HCRx7p9sVMOWGzb/vA1hwiWc6jm3MvQDTogQkiqIhJV0nBQBTU+3okKCFDy9WwferkHjtxib7t3xIUQtHxnIwtx4mpg26/HfwVNVDb4oI9RHmx5WGelRVlrtiw43zboCLaxv46AZeB3IlTkwouebTr1y2NjSpHz68WNFjHvupy3q8TFn3Hos2IAk4Ju5dCo8B3wP7VPr/FGaKiG+T+v+TQqIrOqMTL1VdWV1DdmcbO8KXBz6esmYWYKPwDL5b5FA1a0hwapHiom0r/cKaoqr+27/XcrS5UwSMbQAAAABJRU5ErkJggg==)](https://deepwiki.com/saicaca/fuwari)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari?ref=badge_shield&issueType=license)
 
-纯静态站点，**不需要任何依赖、不需要编译**，双击 `index.html` 就能看。
+A static blog template built with [Astro](https://astro.build).
 
+[**🖥️ Live Demo (Vercel)**](https://fuwari.vercel.app)
+
+![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
+
+🌏 README in
+[**中文**](https://github.com/saicaca/fuwari/blob/main/docs/README.zh-CN.md) /
+[**日本語**](https://github.com/saicaca/fuwari/blob/main/docs/README.ja.md) /
+[**한국어**](https://github.com/saicaca/fuwari/blob/main/docs/README.ko.md) /
+[**Español**](https://github.com/saicaca/fuwari/blob/main/docs/README.es.md) /
+[**ไทย**](https://github.com/saicaca/fuwari/blob/main/docs/README.th.md) /
+[**Tiếng Việt**](https://github.com/saicaca/fuwari/blob/main/docs/README.vi.md) /
+[**Bahasa Indonesia**](https://github.com/saicaca/fuwari/blob/main/docs/README.id.md) (Provided by the community and may not always be up-to-date)
+
+## ✨ Features
+
+- [x] Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com)
+- [x] Smooth animations and page transitions
+- [x] Light / dark mode
+- [x] Customizable theme colors & banner
+- [x] Responsive design
+- [x] Search functionality with [Pagefind](https://pagefind.app/)
+- [x] [Markdown extended features](https://github.com/saicaca/fuwari?tab=readme-ov-file#-markdown-extended-syntax)
+- [x] Table of contents
+- [x] RSS feed
+
+## 🚀 Getting Started
+
+1. Create your blog repository:
+    - [Generate a new repository](https://github.com/saicaca/fuwari/generate) from this template or fork this repository.
+    - Or run one of the following commands:
+       ```sh
+       npm create fuwari@latest
+       yarn create fuwari
+       pnpm create fuwari@latest
+       bun create fuwari@latest
+       deno run -A npm:create-fuwari@latest
+       ```
+2. To edit your blog locally, clone your repository, run `pnpm install` to install dependencies.
+    - Install [pnpm](https://pnpm.io) `npm install -g pnpm` if you haven't.
+3. Edit the config file `src/config.ts` to customize your blog.
+4. Run `pnpm new-post <filename>` to create a new post and edit it in `src/content/posts/`.
+5. Deploy your blog to Vercel, Netlify, GitHub Pages, etc. following [the guides](https://docs.astro.build/en/guides/deploy/). You need to edit the site configuration in `astro.config.mjs` before deployment.
+
+## 📝 Frontmatter of Posts
+
+```yaml
 ---
-
-## 文件结构
-
-```
-portfolio/
-├── index.html              # 页面骨架（基本不用动）
-├── README.md               # 本文件
-├── .gitignore              # Git 忽略规则
-├── .assetsignore           # Cloudflare 部署时忽略的文件
-├── docs/
-│   ├── preview-light.png   # 效果图（浅色）
-│   └── preview-dark.png    # 效果图（深色）
-└── assets/
-    ├── css/style.css       # 样式（改配色看这里）
-    ├── js/content.js       # ★ 内容配置（改内容看这里）
-    ├── js/main.js          # 渲染逻辑（不用动）
-    └── img/                # 放头像、项目截图
-```
-
-> `docs/`、`README.md` 这些不会部署到线上（由 `.assetsignore` 排除），只有 `index.html` 和 `assets/` 会公开。
-
+title: My First Blog Post
+published: 2023-09-09
+description: This is the first post of my new Astro blog.
+image: ./cover.jpg
+tags: [Foo, Bar]
+category: Front-end
+draft: false
+lang: jp      # Set only if the post's language differs from the site's language in `config.ts`
 ---
-
-## 怎么改内容（只需要改一个文件）
-
-打开 **`assets/js/content.js`**，里面全是中文注释，改完保存、刷新浏览器即可。
-
-| 想改什么 | 改哪里 |
-| --- | --- |
-| 名字、一句话介绍 | `hero.name` / `hero.tagline` |
-| 头像 | `hero.avatar` 填图片路径，或留空自动用名字首字 |
-| 首屏按钮 | `hero.buttons`（`href` 可以填 `#projects` 这种页内锚点） |
-| 关于我 | `about.paragraphs`（几个元素就是几段） |
-| 技能标签 | `skills.items` |
-| 项目卡片 | `projects.items`（标题、描述、标签、链接） |
-| 联系方式 | `contact.items` |
-| 页脚版权 | `footer.text` |
-| 浏览器标题 / SEO | `meta.title` / `meta.description` |
-
-### 换头像
-
-1. 把图片放到 `assets/img/` 下，比如 `assets/img/avatar.jpg`
-2. 在 `content.js` 里写 `avatar: "assets/img/avatar.jpg"`
-
-建议用正方形图片，尺寸 400×400 左右就够。
-
----
-
-## 怎么改配色
-
-打开 `assets/css/style.css`，最上面的 `:root`（浅色）和 `[data-theme="dark"]`（深色）里有两个变量：
-
-```css
---accent: #4f46e5;   /* 主色，按钮、链接、标签都用它 */
---bg: #fbfbfd;       /* 页面背景 */
-```
-
-改 `--accent` 一行就能换整站主色调。
-
----
-
-## 本地预览
-
-直接双击 `index.html`。
-
-想看两种配色：在地址栏后面加 `?theme=light` 或 `?theme=dark`。
-
-想让手机也能看（同一个 WiFi 下）：
-
-```bash
-python -m http.server 8000
 ```
 
-然后手机浏览器访问 `http://电脑IP:8000`。
+## 🧩 Markdown Extended Syntax
 
----
+In addition to Astro's default support for [GitHub Flavored Markdown](https://github.github.com/gfm/), several extra Markdown features are included:
 
-## 部署到 Cloudflare Pages
+- Admonitions ([Preview and Usage](https://fuwari.vercel.app/posts/markdown-extended/#admonitions))
+- GitHub repository cards ([Preview and Usage](https://fuwari.vercel.app/posts/markdown-extended/#github-repository-cards))
+- Enhanced code blocks with Expressive Code ([Preview](https://fuwari.vercel.app/posts/expressive-code/) / [Docs](https://expressive-code.com/))
 
-### 方式一：连 GitHub（推荐，以后改完 push 就自动更新）
+## ⚡ Commands
 
-1. 把整个文件夹推到 GitHub 仓库，**`index.html` 放在仓库根目录**
-2. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-3. 选择仓库，然后填：
+All commands are run from the root of the project, from a terminal:
 
-| 配置项 | 填什么 |
-| --- | --- |
-| Project name | 随便起，会变成 `xxx.pages.dev` |
-| Framework preset | **None** |
-| Build command | **留空** |
-| Build output directory | **`/`** |
+| Command                    | Action                                              |
+|:---------------------------|:----------------------------------------------------|
+| `pnpm install`             | Installs dependencies                               |
+| `pnpm dev`                 | Starts local dev server at `localhost:4321`         |
+| `pnpm build`               | Build your production site to `./dist/`             |
+| `pnpm preview`             | Preview your build locally, before deploying        |
+| `pnpm check`               | Run checks for errors in your code                  |
+| `pnpm format`              | Format your code using Biome                        |
+| `pnpm new-post <filename>` | Create a new post                                   |
+| `pnpm astro ...`           | Run CLI commands like `astro add`, `astro check`    |
+| `pnpm astro --help`        | Get help using the Astro CLI                        |
 
-4. 点 **Save and Deploy**，一分钟左右就能通过 `https://xxx.pages.dev` 访问
+## ✏️ Contributing
 
-### 方式二：不连 GitHub，直接传
+Check out the [Contributing Guide](https://github.com/saicaca/fuwari/blob/main/CONTRIBUTING.md) for details on how to contribute to this project.
 
-```bash
-# 先装 wrangler
-npm install -g wrangler
+## 📄 License
 
-# 在 portfolio 目录里执行
-wrangler pages deploy . --project-name=你的项目名
-```
+This project is licensed under the MIT License.
 
-或者直接在网页面板里**拖拽整个文件夹**。
-
-> 如果 `index.html` 不在仓库根目录（比如在 `portfolio/` 子目录），把 Build output directory 改成 `portfolio`。
-
----
-
-## 绑定自己的域名
-
-### 前提：域名的 DNS 必须托管在 Cloudflare
-
-Cloudflare Pages 的自动 HTTPS 证书只给**托管在 Cloudflare 上的域名**签发，所以先把域名接进来。
-
-**第 1 步：把域名接入 Cloudflare**
-
-1. 登录 Cloudflare → **Add a site** → 输入你的域名（如 `example.com`）
-2. 选 **Free** 套餐
-3. Cloudflare 会给你两个 **nameserver**（形如 `ada.ns.cloudflare.com`）
-4. 去你**买域名的网站**（阿里云 / 腾讯云 / Namecheap / GoDaddy）→ 找到「DNS 服务器 / Nameservers」→ 改成 Cloudflare 给的那两个
-5. 回到 Cloudflare 点 **Done, check nameservers**，等生效（几分钟到 24 小时）
-
-> 域名在国内注册商买的也没问题，**指向 Cloudflare 不需要备案**（备案只针对服务器在中国大陆的情况）。
-
-**第 2 步：在 Pages 项目里绑定域名**
-
-1. 打开你的 Pages 项目 → **Custom domains** 标签
-2. 点 **Set up a custom domain**
-3. 输入域名：
-   - 用主域名：`example.com`
-   - 或用子域名：`www.example.com` / `blog.example.com`
-4. 点 **Continue** → Cloudflare 会自动加好 DNS 记录 → 点 **Activate domain**
-
-**第 3 步：等证书**
-
-状态会经历 `Initializing` → `Pending` → `Active`，通常 **1–5 分钟**。变成 Active 就能用 `https://你的域名` 访问了。
-
-### 建议的 DNS 结构
-
-| 类型 | 名称 | 内容 | 代理状态 |
-| --- | --- | --- | --- |
-| CNAME | `@`（根域名） | `你的项目.pages.dev` | 🟠 已代理 |
-| CNAME | `www` | `你的项目.pages.dev` | 🟠 已代理 |
-
-根域名用 CNAME 是 Cloudflare 特有的（它会把 CNAME 扁平化），别的 DNS 服务商一般不允许。
-
-### 让 www 和根域名都指向同一个站
-
-在 Pages 项目的 **Custom domains** 里**把两个都加上**（`example.com` 和 `www.example.com`），然后在 Cloudflare 的 **Rules → Redirect Rules** 里加一条：
-
-```
-当 hostname 等于 www.example.com  →  重定向到 https://example.com/$1  （301）
-```
-
-### 常见问题
-
-| 现象 | 原因 / 解决 |
-| --- | --- |
-| 证书一直 `Pending` | 域名的 NS 还没完全切到 Cloudflare；去 **DNS → Records** 看是否有冲突的 A/AAAA 记录，删掉 |
-| 打开是 522 / 521 | DNS 记录没指向 `xxx.pages.dev`，或代理状态没开 |
-| 国内访问慢 | Cloudflare 免费版走境外节点，国内速度一般；要快只能上国内 CDN（那需要备案） |
-| 改了内容线上没变 | 确认 GitHub 已经 push；Pages 会重新构建，看 **Deployments** 里的状态 |
-
----
-
-## 特性
-
-- 响应式，手机 / 平板 / 桌面都适配
-- 深浅色主题切换（跟随系统，记忆选择，也支持 `?theme=` 强制）
-- 滚动淡入动画（禁用 JS 时自动降级为直接显示）
-- 无外部依赖：不引用任何 CDN、字体、图标库，断网也能正常显示
-- 语义化 HTML，自带 SEO 基础标签
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari?ref=badge_large&issueType=license)
