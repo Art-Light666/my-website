@@ -1,0 +1,91 @@
+<!--
+  评论加载器
+  放在 Layout 里（每个页面都会执行），因为 swup 切换页面时不会重新执行页面内的 script
+-->
+<script>
+	const GISCUS_SRC = "https://giscus.app/client.js";
+	const UTTERANCES_SRC = "https://utteranc.es/client.js";
+
+	function isDark(): boolean {
+		return document.documentElement.classList.contains("dark");
+	}
+
+	function mountComments(): void {
+		const el = document.getElementById("comments-mount");
+		if (!el) return;
+		if (el.dataset.mounted === "1") return;
+		el.dataset.mounted = "1";
+
+		const provider = el.dataset.provider;
+		const script = document.createElement("script");
+		script.async = true;
+		script.crossOrigin = "anonymous";
+
+		if (provider === "giscus") {
+			script.src = GISCUS_SRC;
+			script.setAttribute("data-repo", el.dataset.repo || "");
+			script.setAttribute("data-repo-id", el.dataset.repoId || "");
+			script.setAttribute("data-category", el.dataset.category || "");
+			script.setAttribute("data-category-id", el.dataset.categoryId || "");
+			script.setAttribute("data-mapping", el.dataset.mapping || "pathname");
+			script.setAttribute("data-strict", "0");
+			script.setAttribute("data-reactions-enabled", el.dataset.reactions || "1");
+			script.setAttribute("data-emit-metadata", "0");
+			script.setAttribute("data-input-position", el.dataset.inputPosition || "top");
+			script.setAttribute("data-theme", isDark() ? "dark" : "light");
+			script.setAttribute("data-lang", el.dataset.lang || "zh-CN");
+			script.setAttribute("data-loading", "lazy");
+		} else {
+			script.src = UTTERANCES_SRC;
+			script.setAttribute("repo", el.dataset.repo || "");
+			script.setAttribute("issue-term", el.dataset.mapping || "pathname");
+			script.setAttribute("theme", isDark() ? "github-dark" : "github-light");
+			script.setAttribute("label", "comment");
+		}
+
+		el.appendChild(script);
+	}
+
+	function syncTheme(): void {
+		const el = document.getElementById("comments-mount");
+		if (!el) return;
+		const iframe = el.querySelector("iframe");
+		if (!iframe || !iframe.contentWindow) return;
+
+		const dark = isDark();
+		if (el.dataset.provider === "giscus") {
+			iframe.contentWindow.postMessage(
+				{ giscus: { setConfig: { theme: dark ? "dark" : "light" } } },
+				"https://giscus.app",
+			);
+		} else {
+			iframe.contentWindow.postMessage(
+				{ type: "set-theme", theme: dark ? "github-dark" : "github-light" },
+				"https://utteranc.es",
+			);
+		}
+	}
+
+	function setup(): void {
+		mountComments();
+
+		if (window.swup?.hooks) {
+			window.swup.hooks.on("page:view", () => {
+				mountComments();
+				syncTheme();
+			});
+		}
+	}
+
+	if (window.swup) {
+		setup();
+	} else {
+		document.addEventListener("swup:enable", setup);
+	}
+
+	const themeObserver = new MutationObserver(syncTheme);
+	themeObserver.observe(document.documentElement, {
+		attributes: true,
+		attributeFilter: ["class"],
+	});
+</script>
