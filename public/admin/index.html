@@ -151,10 +151,12 @@
   <div class="tabs">
     <button class="tab is-active" data-tab="new">写新的</button>
     <button class="tab" data-tab="list">已有文章</button>
+    <button class="tab" data-tab="files">文件下载</button>
   </div>
 
   <!-- 编辑器 -->
   <div class="panel is-active" id="panelNew">
+    <p class="hint" id="editingHint" style="margin:0 0 12px;font-weight:600;color:var(--accent)"></p>
     <div class="card">
       <div class="grid">
         <label><span class="lbl">标题</span><input type="text" id="fTitle" placeholder="今天想写点什么"></label>
@@ -217,6 +219,25 @@
     <div id="postList"></div>
   </div>
 
+  <!-- 文件下载 -->
+  <div class="panel" id="panelFiles">
+    <div class="card">
+      <p class="hint" style="margin-top:0">上传的文件会放进仓库的 <code>public/downloads/</code>，别人可以在 <a href="/downloads/" target="_blank">/downloads/</a> 页面下载。单个文件建议 20MB 以内。</p>
+      <div class="row">
+        <label class="btn" style="margin:0;cursor:pointer">
+          选择文件上传
+          <input type="file" id="fileDoc" style="display:none">
+        </label>
+        <span class="status" id="fileStatus"></span>
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:14px">
+      <button class="btn" id="btnReloadFiles">刷新列表</button>
+      <span class="status" id="fileListStatus"></span>
+    </div>
+    <div id="fileList"></div>
+  </div>
+
 </div>
 
 <script>
@@ -226,7 +247,7 @@
   var LS_KEY = "fuwari-admin-cfg-v1";
   var API = "https://api.github.com";
 
-  var cfg = { repo: "Art-Light666/my-blog", branch: "main", token: "" };
+  var cfg = { repo: "Art-Light666/my-website", branch: "main", token: "" };
   var current = { path: "", sha: "" };
 
   function $(id) { return document.getElementById(id); }
@@ -502,8 +523,10 @@ var bodyText = $("body").value
           row.className = "post-item";
           row.innerHTML = '<div class="grow"><div class="name">' + it.name + '</div>' +
             '<div class="meta">' + Math.round(it.size / 1024 * 10) / 10 + ' KB</div></div>' +
-            '<span class="tag">打开编辑</span>';
+            '<span class="tag">打开编辑</span>' +
+            '<button class="btn" style="padding:4px 12px;font-size:13px">删除</button>';
           row.onclick = function () { openPost(it.path, it.name); };
+          row.querySelector("button").onclick = function (ev) { ev.stopPropagation(); deletePost(it.path, it.name, it.sha); };
           box.appendChild(row);
         });
         setStatus("listStatus", "共 " + list.length + " 篇");
@@ -511,6 +534,85 @@ var bodyText = $("body").value
       .catch(function (e) { setStatus("listStatus", "加载失败：" + e.message, "err"); });
   }
 
+  /* ---------------- 删除文章 ---------------- */
+  function deletePost(path, name, sha) {
+    if (!confirm("确定删除《" + name + "》吗？删除后无法恢复。")) return;
+    setStatus("listStatus", "删除中…");
+    api("/repos/" + cfg.repo + "/contents/" + path, {
+      method: "DELETE",
+      body: { message: "delete: " + name, sha: sha, branch: cfg.branch }
+    }).then(function () {
+      setStatus("listStatus", "已删除：" + name, "ok");
+      if (current.path === path) { current = { path: "", sha: "" }; }
+      loadList();
+    }).catch(function (e) { setStatus("listStatus", "删除失败：" + e.message, "err"); });
+  }
+
+  /* ---------------- 下载文件 ---------------- */
+  var DOWNLOAD_DIR = "public/downloads";
+
+  function loadFiles() {
+    if (!cfg.repo) { setStatus("fileListStatus", "先去设置里填仓库", "err"); return; }
+    setStatus("fileListStatus", "加载中…");
+    api("/repos/" + cfg.repo + "/contents/" + DOWNLOAD_DIR + "?ref=" + encodeURIComponent(cfg.branch))
+      .then(function (items) {
+        var list = (items || []).filter(function (it) { return it.type === "file" && it.name.charAt(0) !== "."; });
+        var box = $("fileList");
+        box.innerHTML = "";
+        if (!list.length) { box.innerHTML = '<p class="hint">还没有文件。</p>'; }
+        list.forEach(function (it) {
+          var row = document.createElement("div");
+          row.className = "post-item";
+          row.innerHTML = '<div class="grow"><div class="name">' + it.name + '</div>' +
+            '<div class="meta">' + Math.round(it.size / 1024 * 10) / 10 + ' KB</div></div>' +
+            '<span class="tag">下载</span>' +
+            '<button class="btn" style="padding:4px 12px;font-size:13px;margin-left:8px">删除</button>';
+          row.querySelector(".tag").style.cursor = "pointer";
+          row.querySelector(".tag").onclick = function () {
+            window.open("/downloads/" + encodeURIComponent(it.name), "_blank");
+          };
+          row.querySelector("button").onclick = function (ev) {
+            ev.stopPropagation();
+            deleteFile(it.path, it.name, it.sha);
+          };
+          box.appendChild(row);
+        });
+        setStatus("fileListStatus", "共 " + list.length + " 个文件");
+      })
+      .catch(function (e) { setStatus("fileListStatus", "加载失败：" + e.message, "err"); });
+  }
+
+  function uploadFile(file) {
+    if (!file) return;
+    if (!cfg.repo || !cfg.token) { setStatus("fileStatus", "先去设置里填仓库和 Token", "err"); return; }
+    if (file.size > 20 * 1024 * 1024) { setStatus("fileStatus", "文件超过 20MB，换个小的或用网盘", "err"); return; }
+    var name = file.name.replace(/[^\w\u4e00-\u9fa5.\-]/g, "_");
+    setStatus("fileStatus", "上传中…（" + Math.round(file.size / 1024) + " KB）");
+    var reader = new FileReader();
+    reader.onload = function () {
+      var b64 = String(reader.result).split(",")[1];
+      api("/repos/" + cfg.repo + "/contents/" + DOWNLOAD_DIR + "/" + encodeURIComponent(name), {
+        method: "PUT",
+        body: { message: "upload: " + name, content: b64, branch: cfg.branch }
+      }).then(function () {
+        setStatus("fileStatus", "已上传：" + name, "ok");
+        loadFiles();
+      }).catch(function (e) { setStatus("fileStatus", "上传失败：" + e.message, "err"); });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function deleteFile(path, name, sha) {
+    if (!confirm("确定删除文件 " + name + "？")) return;
+    setStatus("fileListStatus", "删除中…");
+    api("/repos/" + cfg.repo + "/contents/" + path, {
+      method: "DELETE",
+      body: { message: "delete: " + name, sha: sha, branch: cfg.branch }
+    }).then(function () {
+      setStatus("fileListStatus", "已删除：" + name, "ok");
+      loadFiles();
+    }).catch(function (e) { setStatus("fileListStatus", "删除失败：" + e.message, "err"); });
+  }
   function parseFrontmatter(text) {
     var m = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
     if (!m) return { data: {}, body: text };
@@ -550,6 +652,8 @@ var bodyText = $("body").value
 
         renderPreview();
         switchTab("new");
+        $("editingHint").textContent = "正在编辑：" + name + "（点「保存修改」会覆盖原文件）";
+        $("btnPublish").textContent = "保存修改";
         setStatus("status", "正在编辑：" + name, "");
         window.scrollTo({ top: 0, behavior: "smooth" });
       })
@@ -593,8 +697,10 @@ var bodyText = $("body").value
     });
     $("panelNew").classList.toggle("is-active", name === "new");
     $("panelList").classList.toggle("is-active", name === "list");
+    $("panelFiles").classList.toggle("is-active", name === "files");
     $("panelSettings").classList.remove("is-active");
     if (name === "list") loadList();
+    if (name === "files") loadFiles();
   }
 
   document.querySelectorAll(".tab").forEach(function (t) {
@@ -607,7 +713,7 @@ var bodyText = $("body").value
   $("btnSaveCfg").onclick = saveCfg;
   $("btnClear").onclick = function () {
     try { localStorage.removeItem(LS_KEY); } catch (e) {}
-    cfg = { repo: "Art-Light666/my-blog", branch: "main", token: "" };
+    cfg = { repo: "Art-Light666/my-website", branch: "main", token: "" };
     loadCfg();
     setStatus("cfgStatus", "已清除", "");
     updateHead();
@@ -624,12 +730,19 @@ var bodyText = $("body").value
 
   $("btnPublish").onclick = publish;
   $("btnReload").onclick = loadList;
+  $("btnReloadFiles").onclick = loadFiles;
+  $("fileDoc").addEventListener("change", function (e) {
+    uploadFile(e.target.files && e.target.files[0]);
+    e.target.value = "";
+  });
   $("btnReset").onclick = function () {
     if (!confirm("清空当前编辑的内容？")) return;
     ["fTitle", "fCategory", "fTags", "fDesc", "fSlug", "body"].forEach(function (id) { $(id).value = ""; });
     $("fDate").value = today();
     $("fDraft").value = "false";
     current = { path: "", sha: "" };
+    $("btnPublish").textContent = "发布";
+    $("editingHint").textContent = "";
     renderPreview();
     setStatus("status", "");
   };

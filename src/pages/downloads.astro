@@ -1,0 +1,68 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import { Icon } from "astro-icon/components";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+
+const dir = path.join(process.cwd(), "public", "downloads");
+
+let files: { name: string; size: number; mtime: number }[] = [];
+try {
+	files = fs
+		.readdirSync(dir, { withFileTypes: true })
+		.filter((entry) => entry.isFile() && !entry.name.startsWith("."))
+		.map((entry) => {
+			const stat = fs.statSync(path.join(dir, entry.name));
+			return { name: entry.name, size: stat.size, mtime: stat.mtimeMs };
+		})
+		.sort((a, b) => b.mtime - a.mtime);
+} catch {
+	files = [];
+}
+
+function formatSize(bytes: number): string {
+	if (bytes < 1024) return `${bytes} B`;
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+	return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+---
+
+<MainGridLayout title="下载" description="可以下载的文件">
+	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
+		<div class="card-base z-10 px-6 md:px-9 py-7 relative w-full onload-animation">
+			<div class="flex items-center gap-3 mb-1">
+				<span class="inline-block w-[3px] h-5 rounded-full bg-[var(--primary)]"></span>
+				<h1 class="font-bold text-2xl text-black/90 dark:text-white/90 transition">下载</h1>
+			</div>
+			<p class="text-sm text-black/45 dark:text-white/45 mb-6 ml-[15px] transition">点一下就能下载</p>
+
+			{files.length === 0 ? (
+				<p class="text-sm text-black/40 dark:text-white/40">还没有文件。</p>
+			) : (
+				<div class="grid gap-3">
+					{files.map((file) => (
+						<a
+							href={`/downloads/${encodeURIComponent(file.name)}`}
+							download
+							class="group flex items-center gap-3 p-3 rounded-xl border border-[var(--line-divider)] bg-[var(--btn-regular-bg)] hover:border-[var(--primary)] hover:bg-[var(--btn-plain-bg-hover)] transition active:scale-[0.98]"
+						>
+							<div class="h-11 w-11 flex-none rounded-lg flex items-center justify-center bg-[var(--btn-regular-bg-hover)] text-[var(--primary)]">
+								<Icon name="material-symbols:download-rounded" class="text-[1.4rem]" />
+							</div>
+							<div class="min-w-0 flex-1">
+								<div class="font-bold text-[0.95rem] text-black/85 dark:text-white/85 truncate group-hover:text-[var(--primary)] transition">
+									{file.name}
+								</div>
+								<div class="text-xs text-black/40 dark:text-white/40 transition">{formatSize(file.size)}</div>
+							</div>
+							<Icon
+								name="material-symbols:download-rounded"
+								class="flex-none text-black/20 dark:text-white/20 group-hover:text-[var(--primary)] transition"
+							/>
+						</a>
+					))}
+				</div>
+			)}
+		</div>
+	</div>
+</MainGridLayout>
