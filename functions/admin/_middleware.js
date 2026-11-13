@@ -83,10 +83,21 @@ export async function onRequest(context) {
 	const { request, env, next } = context;
 	const url = new URL(request.url);
 
-	const password = env && env.ADMIN_PASSWORD;
 	const kv = getKV(env);
 
-	// 没配密码或没有 KV：直接放行，避免把自己锁在外面
+	// 密码来源（按优先级）：
+	//   1. 环境变量 ADMIN_PASSWORD
+	//   2. KV 里的 admin:password
+	// 都没配就直接放行，避免把自己锁在外面
+	let password = (env && env.ADMIN_PASSWORD) || "";
+	if (!password && kv) {
+		try {
+			password = (await kv.get("admin:password")) || "";
+		} catch {
+			password = "";
+		}
+	}
+
 	if (!password || !kv) {
 		return next();
 	}
