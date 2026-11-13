@@ -1,0 +1,48 @@
+<!--
+  访问统计（不蒜子）
+  - 站点：总访问量 + 独立访客数
+  - 文章：每篇阅读量
+  配合 swup：每次无刷新跳转后重新请求一次，保证每篇文章都被记录
+-->
+<script>
+	const SCRIPT_SRC = "//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+
+	function injectBusuanzi(): void {
+		// 先移除旧的，保证每次都会重新请求并计数
+		const old = document.getElementById("busuanzi-script");
+		if (old) {
+			old.remove();
+		}
+
+		const s = document.createElement("script");
+		s.id = "busuanzi-script";
+		s.src = SCRIPT_SRC;
+		s.defer = true;
+		s.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+		document.head.appendChild(s);
+	}
+
+	let firstView = true;
+
+	function setup(): void {
+		if (!window.swup?.hooks) {
+			return;
+		}
+		window.swup.hooks.on("page:view", () => {
+			// 首次进入时页面加载已经统计过一次，跳过避免重复
+			if (firstView) {
+				firstView = false;
+				return;
+			}
+			injectBusuanzi();
+		});
+	}
+
+	injectBusuanzi();
+
+	if (window.swup) {
+		setup();
+	} else {
+		document.addEventListener("swup:enable", setup);
+	}
+</script>
