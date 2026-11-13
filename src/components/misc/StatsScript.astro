@@ -1,24 +1,57 @@
 <!--
-  访问统计（不蒜子）
-  - 站点：总访问量 + 独立访客数
-  - 文章：每篇阅读量
-  配合 swup：每次无刷新跳转后重新请求一次，保证每篇文章都被记录
--->
-<script>
-	const SCRIPT_SRC = "//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+  访问统计（不蒜子计数服务）
+  ------------------------------------------------------------------
+  为什么不直接用官方 client.js：
+    主题的 MainGridLayout 会把 Footer 渲染两次（桌面/移动两套布局），
+    官方脚本靠固定 id 填充，只会更新第一份，第二份永远是空的，
+    还会造成页面里出现重复 id。
 
-	function injectBusuanzi(): void {
-		// 先移除旧的，保证每次都会重新请求并计数
-		const old = document.getElementById("busuanzi-script");
-		if (old) {
-			old.remove();
+  这里改为自己请求它的 JSONP 接口，拿到数据后按属性填充所有节点：
+    data-bz-container="site_pv"  容器（收到数据后显示）
+    data-bz="site_pv"            数值
+  可用键：site_pv（总访问）/ site_uv（访客数）/ page_pv（本页阅读）
+  每次请求本身就会让服务端记一次访问。
+-->
+
+<script>
+	const ENDPOINT = "//busuanzi.ibruce.info/busuanzi?jsonpCallback=";
+
+	function applyStats(data: Record<string, number>): void {
+		for (const key of ["site_pv", "site_uv", "page_pv"]) {
+			const value = data[key];
+			if (value === undefined || value === null) {
+				continue;
+			}
+			document.querySelectorAll(`[data-bz="${key}"]`).forEach((el) => {
+				el.textContent = String(value);
+			});
+			document.querySelectorAll(`[data-bz-container="${key}"]`).forEach((el) => {
+				(el as HTMLElement).style.display = "inline";
+			});
 		}
+	}
+
+	function fetchStats(): void {
+		const callback = `BusuanziCallback_${Math.floor(Math.random() * 1099511627776)}`;
+		const w = window as unknown as Record<string, unknown>;
+
+		w[callback] = (data: Record<string, number>) => {
+			try {
+				applyStats(data);
+			} finally {
+				try {
+					delete w[callback];
+				} catch {
+					/* ignore */
+				}
+			}
+		};
 
 		const s = document.createElement("script");
-		s.id = "busuanzi-script";
-		s.src = SCRIPT_SRC;
-		s.defer = true;
+		s.src = ENDPOINT + callback;
 		s.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+		s.onload = () => s.remove();
+		s.onerror = () => s.remove();
 		document.head.appendChild(s);
 	}
 
@@ -29,16 +62,16 @@
 			return;
 		}
 		window.swup.hooks.on("page:view", () => {
-			// 首次进入时页面加载已经统计过一次，跳过避免重复
+			// 首次进入时页面加载已经统计过一次，跳过避免重复计数
 			if (firstView) {
 				firstView = false;
 				return;
 			}
-			injectBusuanzi();
+			fetchStats();
 		});
 	}
 
-	injectBusuanzi();
+	fetchStats();
 
 	if (window.swup) {
 		setup();
