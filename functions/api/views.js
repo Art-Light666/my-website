@@ -4,10 +4,13 @@
  */
 
 function getKV(env) {
-	// 只认显式绑定的 VIEWS，避免误碰 Pages 自带的 ASSETS 等 RPC 绑定
-	const kv = env && env.VIEWS;
-	if (kv && typeof kv.get === "function" && typeof kv.put === "function") {
-		return kv;
+	// 绑定名大小写都可能，挨个试；避免误碰 Pages 自带的 ASSETS（RPC 绑定）
+	if (!env) return null;
+	for (const name of ["VIEWS", "views", "Views"]) {
+		const kv = env[name];
+		if (kv && typeof kv.get === "function" && typeof kv.put === "function") {
+			return kv;
+		}
 	}
 	return null;
 }
@@ -37,7 +40,7 @@ export async function onRequest(context) {
 		const url = new URL(request.url);
 
 		if (url.searchParams.get("debug") === "1") {
-			return respond({ envKeys: Object.keys(env || {}), hasViews: !!(env && env.VIEWS) });
+			return respond({ envKeys: Object.keys(env || {}), hasViews: !!(env && (env.VIEWS || env.views)) });
 		}
 
 		let path = url.searchParams.get("path") || "/";
