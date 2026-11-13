@@ -162,7 +162,6 @@
         <label><span class="lbl">标题</span><input type="text" id="fTitle" placeholder="今天想写点什么"></label>
         <label><span class="lbl">日期</span><input type="date" id="fDate"></label>
         <label><span class="lbl">分类</span><input type="text" id="fCategory" placeholder="随笔"></label>
-        <label><span class="lbl">标签（逗号隔开）</span><input type="text" id="fTags" placeholder="日常, 折腾"></label>
       </div>
       <label><span class="lbl">摘要（卡片上显示的一句话）</span><input type="text" id="fDesc" placeholder="留空就用正文开头"></label>
       <div class="grid">
@@ -455,7 +454,7 @@
     var title = $("fTitle").value.trim();
     var date = $("fDate").value || today();
     var category = $("fCategory").value.trim();
-    var tags = $("fTags").value.split(/[,，、\s]+/).filter(Boolean);
+    var tags = [];
     var draft = $("fDraft").value === "true";
     var slug = $("fSlug").value.trim() || ("post-" + date.replace(/-/g, ""));
     var description = $("fDesc").value.trim();
@@ -643,7 +642,6 @@ var bodyText = $("body").value
         $("fTitle").value = d.title || "";
         $("fDate").value = d.published ? String(d.published).slice(0, 10) : today();
         $("fCategory").value = d.category || "";
-        $("fTags").value = Array.isArray(d.tags) ? d.tags.join(", ") : (d.tags || "");
         $("fDesc").value = d.description || "";
         $("fSlug").value = name.replace(/\.md$/, "");
         $("fDraft").value = String(d.draft === true || d.draft === "true");
@@ -737,7 +735,7 @@ var bodyText = $("body").value
   });
   $("btnReset").onclick = function () {
     if (!confirm("清空当前编辑的内容？")) return;
-    ["fTitle", "fCategory", "fTags", "fDesc", "fSlug", "body"].forEach(function (id) { $(id).value = ""; });
+    ["fTitle", "fCategory", "fDesc", "fSlug", "body"].forEach(function (id) { $(id).value = ""; });
     $("fDate").value = today();
     $("fDraft").value = "false";
     current = { path: "", sha: "" };
