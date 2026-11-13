@@ -12,6 +12,7 @@ import rehypeComponents from "rehype-components"; /* Render the custom directive
 import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive"; /* Handle directives */
+import remarkBreaks from "remark-breaks";
 import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
@@ -104,6 +105,7 @@ export default defineConfig({
 	],
 	markdown: {
 		remarkPlugins: [
+			remarkBreaks,
 			remarkMath,
 			remarkReadingTime,
 			remarkExcerpt,

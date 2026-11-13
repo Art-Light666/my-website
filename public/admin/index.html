@@ -188,6 +188,7 @@
         <button class="btn" data-ins="> | |引用">引用</button>
         <button class="btn" data-ins="- | |条目">列表</button>
         <span class="spacer" style="flex:1"></span>
+        <span class="hint" style="margin:0">回车 = 换行，空一行 = 新段落</span>
         <label class="btn" style="margin:0;cursor:pointer">
           插入图片
           <input type="file" id="fileImage" accept="image/*" style="display:none">
@@ -437,7 +438,11 @@
     var draft = $("fDraft").value === "true";
     var slug = $("fSlug").value.trim() || ("post-" + date.replace(/-/g, ""));
     var description = $("fDesc").value.trim();
-    var bodyText = $("body").value.replace(/\s+$/, "");
+var bodyText = $("body").value
+      .split("\n")
+      .map(function (line) { return line.replace(/[ \t]+$/, ""); })
+      .join("\n")
+      .replace(/\s+$/, "");
 
     if (!cfg.repo || !cfg.token) { setStatus("status", "先去右上角「设置」填仓库和 Token", "err"); return; }
     if (!title) { $("fTitle").focus(); setStatus("status", "标题不能为空", "err"); return; }
