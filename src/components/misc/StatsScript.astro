@@ -1,20 +1,18 @@
 <!--
   访问统计
   ------------------------------------------------------------------
-  首选：自建后端 /api/views（Cloudflare Pages Functions + KV）
-        数据存在你自己的 Cloudflare 账号里，可以从 0 开始、随时清零。
-  兜底：后端不可用（没绑定 KV / 请求失败）时，自动回退到不蒜子，
-        保证页面上不会空一块。
+  数据全部来自自建后端 /api/views（Cloudflare Pages Functions + KV）。
+  不依赖任何第三方统计服务；后端不可用时计数器保持隐藏。
 
   页面标记约定：
     data-bz-container="site_pv"   容器（拿到数据后显示）
     data-bz="site_pv"             数值节点
-  可用键：site_pv（总访问次数）/ site_uv（访客数）/ page_pv（本页阅读量）
+  可用键：site_pv（总访问人次）/ site_uv（访客数）/ page_pv（本页阅读量）
 -->
 
 <script>
 	const API = "/api/views";
-	const FALLBACK_TIMEOUT = 4000;
+	const TIMEOUT = 5000;
 
 	function applyStats(values: Record<string, number | undefined>): void {
 		for (const key of ["site_pv", "site_uv", "page_pv"]) {
@@ -31,44 +29,15 @@
 		}
 	}
 
-	/** 兜底：不蒜子（第三方） */
-	function useBusuanzi(): void {
-		const callback = `BusuanziCallback_${Math.floor(Math.random() * 1099511627776)}`;
-		const w = window as unknown as Record<string, unknown>;
-
-		w[callback] = (data: Record<string, number>) => {
-			try {
-				applyStats({
-					site_pv: data.site_pv,
-					site_uv: data.site_uv,
-					page_pv: data.page_pv,
-				});
-			} finally {
-				try {
-					delete w[callback];
-				} catch {
-					/* ignore */
-				}
-			}
-		};
-
-		const s = document.createElement("script");
-		s.src = `//busuanzi.ibruce.info/busuanzi?jsonpCallback=${callback}`;
-		s.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
-		s.onload = () => s.remove();
-		s.onerror = () => s.remove();
-		document.head.appendChild(s);
-	}
-
 	async function loadStats(): Promise<void> {
 		const controller = new AbortController();
-		const timer = setTimeout(() => controller.abort(), FALLBACK_TIMEOUT);
+		const timer = setTimeout(() => controller.abort(), TIMEOUT);
 
 		try {
-			const res = await fetch(
-				`${API}?path=${encodeURIComponent(location.pathname)}`,
-				{ headers: { accept: "application/json" }, signal: controller.signal },
-			);
+			const res = await fetch(`${API}?path=${encodeURIComponent(location.pathname)}`, {
+				headers: { accept: "application/json" },
+				signal: controller.signal,
+			});
 			if (!res.ok) {
 				throw new Error(`api ${res.status}`);
 			}
@@ -82,8 +51,7 @@
 				page_pv: data.pageViews,
 			});
 		} catch {
-			// 后端没准备好，退回不蒜子，页面不会留空
-			useBusuanzi();
+			// 后端不可用时保持隐藏，不做任何第三方兜底
 		} finally {
 			clearTimeout(timer);
 		}
