@@ -34,7 +34,7 @@ function randomToken() {
 	return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function loginPage(message) {
+function loginPage(message, status) {
 	const html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -70,7 +70,7 @@ function loginPage(message) {
 </body>
 </html>`;
 	return new Response(html, {
-		status: message ? 401 : 200,
+		status: status || (message ? 401 : 200),
 		headers: {
 			"content-type": "text/html; charset=utf-8",
 			"cache-control": "no-store",
@@ -100,6 +100,16 @@ export async function onRequest(context) {
 
 	if (!password || !kv) {
 		return next();
+	}
+
+	// 失败限流：同一 IP 连错 4 次，锁 10 分钟
+	const ip = request.headers.get("cf-connecting-ip") || "unknown";
+	const lockKey = `admin:lock:${ip}`;
+	const failKey = `admin:fail:${ip}`;
+
+	const locked = await kv.get(lockKey);
+	if (locked) {
+		return loginPage("尝试次数过多，请 10 分钟后再试", 429);
 	}
 
 	// 退出登录
@@ -140,6 +150,7 @@ export async function onRequest(context) {
 			/* ignore */
 		}
 		if (submitted && submitted === password) {
+			await kv.delete(failKey);
 			const fresh = randomToken();
 			await kv.put(`admin:sess:${fresh}`, "1", { expirationTtl: 60 * 60 * 24 * 7 });
 			return new Response(null, {
@@ -150,7 +161,14 @@ export async function onRequest(context) {
 				},
 			});
 		}
-		return loginPage("密码不对，再试一次");
+		const fails = Number.parseInt((await kv.get(failKey)) || "0", 10) + 1;
+		if (fails >= 4) {
+			await kv.put(lockKey, "1", { expirationTtl: 600 });
+			await kv.delete(failKey);
+			return loginPage("尝试次数过多，请 10 分钟后再试", 429);
+		}
+		await kv.put(failKey, String(fails), { expirationTtl: 600 });
+		return loginPage(`密码不对，还可以试 ${4 - fails} 次`, 401);
 	}
 
 	return loginPage("");
