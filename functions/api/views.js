@@ -83,7 +83,8 @@ export async function onRequest(context) {
 
 		// 站内跳转不重复加访问人次：30 分钟内算同一次访问
 		const hasSession = readCookie(cookieHeader, "bz_sess") === "1";
-		if (!hasSession) {
+		const siteReset = pvRaw === null;
+		if (!hasSession || siteReset) {
 			siteViews += 1;
 			writes.push(kv.put("site:pv", String(siteViews)));
 		}
@@ -91,7 +92,8 @@ export async function onRequest(context) {
 
 		// 访客数：每个浏览器一辈子只算一次
 		const hasUv = readCookie(cookieHeader, "bz_uv") === "1";
-		if (!hasUv) {
+		const uvReset = uvRaw === null;
+		if (!hasUv || uvReset) {
 			siteUv += 1;
 			writes.push(kv.put("site:uv", String(siteUv)));
 			cookies.push("bz_uv=1; Max-Age=31536000; Path=/; SameSite=Lax");
