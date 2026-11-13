@@ -1,6 +1,11 @@
 /**
  * 访问统计接口（Cloudflare Pages Functions）
  * GET /api/views?path=/posts/xxx/
+ *
+ * 计数规则：
+ *   page:<path>  每打开一次这个页面 +1     （文章阅读量，每次导航都算）
+ *   site:pv      30 分钟内的连续浏览算一次   （访问人次，站内跳转不重复加）
+ *   site:uv      每个浏览器只算一次          （访客数，靠一年期 cookie）
  */
 
 function getKV(env) {
@@ -25,12 +30,19 @@ function readCookie(cookieHeader, name) {
 	return null;
 }
 
-function respond(payload, status, extraHeaders) {
-	const headers = Object.assign(
-		{ "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-		extraHeaders || {},
-	);
+function respond(payload, status, cookies) {
+	const headers = new Headers({
+		"content-type": "application/json; charset=utf-8",
+		"cache-control": "no-store",
+	});
+	for (const cookie of cookies || []) {
+		headers.append("set-cookie", cookie);
+	}
 	return new Response(JSON.stringify(payload), { status: status || 200, headers });
+}
+
+function toInt(value) {
+	return Number.parseInt(value || "0", 10) || 0;
 }
 
 export async function onRequest(context) {
@@ -40,7 +52,7 @@ export async function onRequest(context) {
 		const url = new URL(request.url);
 
 		if (url.searchParams.get("debug") === "1") {
-			return respond({ envKeys: Object.keys(env || {}), hasViews: !!(env && (env.VIEWS || env.views)) });
+			return respond({ envKeys: Object.keys(env || {}), hasViews: !!getKV(env) });
 		}
 
 		let path = url.searchParams.get("path") || "/";
@@ -52,32 +64,46 @@ export async function onRequest(context) {
 			return respond({ error: "kv_binding_missing", envKeys: Object.keys(env || {}) }, 503);
 		}
 
+		const cookieHeader = request.headers.get("cookie");
 		const pageKey = `page:${path}`;
+
 		const [pageRaw, pvRaw, uvRaw] = await Promise.all([
 			kv.get(pageKey),
 			kv.get("site:pv"),
 			kv.get("site:uv"),
 		]);
 
-		let pageViews = (Number.parseInt(pageRaw || "0", 10) || 0) + 1;
-		let siteViews = (Number.parseInt(pvRaw || "0", 10) || 0) + 1;
-		let siteUv = Number.parseInt(uvRaw || "0", 10) || 0;
+		// 每次打开页面都算一次阅读
+		const pageViews = toInt(pageRaw) + 1;
 
-		const extraHeaders = {};
-		const writes = [kv.put(pageKey, String(pageViews)), kv.put("site:pv", String(siteViews))];
+		let siteViews = toInt(pvRaw);
+		let siteUv = toInt(uvRaw);
+		const cookies = [];
+		const writes = [kv.put(pageKey, String(pageViews))];
 
-		if (readCookie(request.headers.get("cookie"), "bz_uv") !== "1") {
+		// 站内跳转不重复加访问人次：30 分钟内算同一次访问
+		const hasSession = readCookie(cookieHeader, "bz_sess") === "1";
+		if (!hasSession) {
+			siteViews += 1;
+			writes.push(kv.put("site:pv", String(siteViews)));
+		}
+		cookies.push("bz_sess=1; Max-Age=1800; Path=/; SameSite=Lax");
+
+		// 访客数：每个浏览器一辈子只算一次
+		const hasUv = readCookie(cookieHeader, "bz_uv") === "1";
+		if (!hasUv) {
 			siteUv += 1;
 			writes.push(kv.put("site:uv", String(siteUv)));
-			extraHeaders["set-cookie"] = "bz_uv=1; Max-Age=31536000; Path=/; SameSite=Lax";
+			cookies.push("bz_uv=1; Max-Age=31536000; Path=/; SameSite=Lax");
 		}
 
 		await Promise.all(writes);
-		return respond({ path, pageViews, siteViews, siteUv }, 200, extraHeaders);
+
+		return respond({ path, pageViews, siteViews, siteUv, newVisit: !hasSession }, 200, cookies);
 	} catch (error) {
-		return respond({
-			error: "exception",
-			message: error && error.message ? error.message : String(error),
-		}, 500);
+		return respond(
+			{ error: "exception", message: error && error.message ? error.message : String(error) },
+			500,
+		);
 	}
 }
