@@ -85,18 +85,8 @@ export async function onRequest(context) {
 
 	const kv = getKV(env);
 
-	// 密码来源（按优先级）：
-	//   1. 环境变量 ADMIN_PASSWORD
-	//   2. KV 里的 admin:password
-	// 都没配就直接放行，避免把自己锁在外面
-	let password = (env && env.ADMIN_PASSWORD) || "";
-	if (!password && kv) {
-		try {
-			password = (await kv.get("admin:password")) || "";
-		} catch {
-			password = "";
-		}
-	}
+	// 密码只从环境变量 ADMIN_PASSWORD 读取；没配置就直接放行，避免把自己锁在外面
+	const password = (env && env.ADMIN_PASSWORD) || "";
 
 	if (!password || !kv) {
 		return next();

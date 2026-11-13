@@ -51,10 +51,6 @@ export async function onRequest(context) {
 		const env = context.env;
 		const url = new URL(request.url);
 
-		if (url.searchParams.get("debug") === "1") {
-			return respond({ envKeys: Object.keys(env || {}), hasViews: !!getKV(env) });
-		}
-
 		let path = url.searchParams.get("path") || "/";
 		if (path.length > 300) path = path.slice(0, 300);
 		if (!path.startsWith("/")) path = `/${path}`;
