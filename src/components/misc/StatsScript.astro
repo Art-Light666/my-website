@@ -1,25 +1,25 @@
 <!--
-  访问统计（不蒜子计数服务）
+  访问统计
   ------------------------------------------------------------------
-  为什么不直接用官方 client.js：
-    主题的 MainGridLayout 会把 Footer 渲染两次（桌面/移动两套布局），
-    官方脚本靠固定 id 填充，只会更新第一份，第二份永远是空的，
-    还会造成页面里出现重复 id。
+  首选：自建后端 /api/views（Cloudflare Pages Functions + KV）
+        数据存在你自己的 Cloudflare 账号里，可以从 0 开始、随时清零。
+  兜底：后端不可用（没绑定 KV / 请求失败）时，自动回退到不蒜子，
+        保证页面上不会空一块。
 
-  这里改为自己请求它的 JSONP 接口，拿到数据后按属性填充所有节点：
-    data-bz-container="site_pv"  容器（收到数据后显示）
-    data-bz="site_pv"            数值
-  可用键：site_pv（总访问）/ site_uv（访客数）/ page_pv（本页阅读）
-  每次请求本身就会让服务端记一次访问。
+  页面标记约定：
+    data-bz-container="site_pv"   容器（拿到数据后显示）
+    data-bz="site_pv"             数值节点
+  可用键：site_pv（总访问次数）/ site_uv（访客数）/ page_pv（本页阅读量）
 -->
 
 <script>
-	const ENDPOINT = "//busuanzi.ibruce.info/busuanzi?jsonpCallback=";
+	const API = "/api/views";
+	const FALLBACK_TIMEOUT = 4000;
 
-	function applyStats(data: Record<string, number>): void {
+	function applyStats(values: Record<string, number | undefined>): void {
 		for (const key of ["site_pv", "site_uv", "page_pv"]) {
-			const value = data[key];
-			if (value === undefined || value === null) {
+			const value = values[key];
+			if (value === undefined || value === null || Number.isNaN(value)) {
 				continue;
 			}
 			document.querySelectorAll(`[data-bz="${key}"]`).forEach((el) => {
@@ -31,13 +31,18 @@
 		}
 	}
 
-	function fetchStats(): void {
+	/** 兜底：不蒜子（第三方） */
+	function useBusuanzi(): void {
 		const callback = `BusuanziCallback_${Math.floor(Math.random() * 1099511627776)}`;
 		const w = window as unknown as Record<string, unknown>;
 
 		w[callback] = (data: Record<string, number>) => {
 			try {
-				applyStats(data);
+				applyStats({
+					site_pv: data.site_pv,
+					site_uv: data.site_uv,
+					page_pv: data.page_pv,
+				});
 			} finally {
 				try {
 					delete w[callback];
@@ -48,30 +53,60 @@
 		};
 
 		const s = document.createElement("script");
-		s.src = ENDPOINT + callback;
+		s.src = `//busuanzi.ibruce.info/busuanzi?jsonpCallback=${callback}`;
 		s.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
 		s.onload = () => s.remove();
 		s.onerror = () => s.remove();
 		document.head.appendChild(s);
 	}
 
-	let firstView = true;
+	async function loadStats(): Promise<void> {
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), FALLBACK_TIMEOUT);
+
+		try {
+			const res = await fetch(
+				`${API}?path=${encodeURIComponent(location.pathname)}`,
+				{ headers: { accept: "application/json" }, signal: controller.signal },
+			);
+			if (!res.ok) {
+				throw new Error(`api ${res.status}`);
+			}
+			const data = await res.json();
+			if (!data || typeof data.siteViews !== "number") {
+				throw new Error("bad payload");
+			}
+			applyStats({
+				site_pv: data.siteViews,
+				site_uv: data.siteUv,
+				page_pv: data.pageViews,
+			});
+		} catch {
+			// 后端没准备好，退回不蒜子，页面不会留空
+			useBusuanzi();
+		} finally {
+			clearTimeout(timer);
+		}
+	}
+
+	let lastPath: string | null = null;
+
+	function countOnce(): void {
+		if (location.pathname === lastPath) {
+			return;
+		}
+		lastPath = location.pathname;
+		void loadStats();
+	}
 
 	function setup(): void {
 		if (!window.swup?.hooks) {
 			return;
 		}
-		window.swup.hooks.on("page:view", () => {
-			// 首次进入时页面加载已经统计过一次，跳过避免重复计数
-			if (firstView) {
-				firstView = false;
-				return;
-			}
-			fetchStats();
-		});
+		window.swup.hooks.on("page:view", countOnce);
 	}
 
-	fetchStats();
+	countOnce();
 
 	if (window.swup) {
 		setup();
